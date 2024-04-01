@@ -1,32 +1,41 @@
-<script setup>
+<script setup lang="ts">
+
+
 const columns = [
   {
     key: 'title',
-    label: 'Title'
+    label: 'Title',
+    sortable: true
   },
   {
     key: 'description',
-    label: 'Description'
+    label: 'Description',
+    sortable: true
   },
   {
     key: 'price',
-    label: 'Price'
+    label: 'Price',
+
   },
   {
     key: 'rating',
-    label: 'Rating'
+    label: 'Rating',
+    sortable: true
   },
   {
     key: 'brand',
-    label: 'Brand'
+    label: 'Brand',
+    sortable: true
   },
   {
     key: 'category',
-    label: 'Category'
+    label: 'Category',
+    sortable: true
   },
   {
     key: 'thumbnail',
-    label: 'Thumbnail'
+    label: 'Thumbnail',
+
   }
 ]
 
@@ -35,42 +44,71 @@ const people = data.value.products;
 
 const q = ref('');
 const page = ref(1);
-const pageCount = 5;
+const pageCount = 4;
 
-
-const filtredData =() => {
+const filteredData = computed(() => {
   if (!q.value) {
     return people;
   }
 
-  return people.filter((person) => {
-    return Object.values(person).some((value) => {
-      return String(value).toLowerCase().includes(q.value.toLowerCase());
-    });
-  });
-};
+  return people.filter(person => Object.values(person).some(value => String(value).toLowerCase().includes(q.value.toLowerCase())));
+});
 
-const filtredRows =  computed(() => {
-  return filtredData();
-})
+const sortColumn = ref(null);
+const sortDirection = ref('asc');
+
+const sortedData = computed(() => {
+  if (!sortColumn.value) {
+    return filteredData.value;
+  }
+
+  return [...filteredData.value].sort((a, b) => {
+    const column = sortColumn.value;
+
+    const aValue = a[column];
+    const bValue = b[column];
+
+    if (aValue === bValue) {
+      return 0;
+    }
+
+    if (sortDirection.value === 'asc') {
+      return aValue < bValue ? -1 : 1;
+    } else {
+      return aValue > bValue ? -1 : 1;
+    }
+  });
+});
+
 const rows = computed(() => {
-  if (filtredData().length <= 5 ) {
+  if (sortedData.value.length <= 5) {
     page.value = 1;
   }
-  const slice = filtredData()
-      .slice((page.value - 1) * pageCount, (page.value) * pageCount);
-  console.log(slice)
-  return slice });
+  const slice = sortedData.value.slice((page.value - 1) * pageCount, page.value * pageCount);
+  return slice;
+});
+
+const handleSort = (columnKey) => {
+  if (sortColumn.value === columnKey) {
+    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
+  } else {
+    sortColumn.value = columnKey;
+    sortDirection.value = 'asc';
+  }
+};
 </script>
+
 <template>
+
   <title>Student list</title>
+  <router-link to="./graphic" class="text-blue-500 hover:underline">Перейти до графіків</router-link>
 
   <div class="flex px-3 py-3.5 border-b border-gray-200 dark:border-gray-700">
-    <UInput v-model="q" placeholder="Filter people..." />
+    <UInput v-model="q" placeholder="Filter people..."/>
   </div>
 
   <div>
-    <UTable :rows="rows" :columns="columns">
+    <UTable :columns="columns" :rows="rows" >
       <template #thumbnail-data="{row}">
         <img :src="row.thumbnail" alt="" class="w-[100px] h-[100px]">
       </template>
@@ -91,11 +129,32 @@ const rows = computed(() => {
       <template #category-data="{row}">
         <div>{{ row.category }}</div>
       </template>
+      <template #title-header="{column}">
+        <div @click="handleSort(column.key)" style="cursor: pointer;">{{ column.label }}</div>
+      </template>
+      <template #description-header="{column}">
+        <div @click="handleSort(column.key)" style="cursor: pointer;">{{ column.label }}</div>
+      </template>
+      <template #price-header="{column}">
+        <div @click="handleSort(column.key)" style="cursor: pointer;">{{ column.label }}</div>
+      </template>
+      <template #rating-header="{column}">
+        <div @click="handleSort(column.key)" style="cursor: pointer;">{{ column.label }}</div>
+      </template>
+      <template #brand-header="{column}">
+        <div @click="handleSort(column.key)" style="cursor: pointer;">{{ column.label }}</div>
+      </template>
+      <template #category-header="{column}">
+        <div @click="handleSort(column.key)" style="cursor: pointer;">{{ column.label }}</div>
+      </template>
+      <template #thumbnail-header="{column}">
+
+      </template>
     </UTable>
+
     <div class="flex justify-center px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-      <UPagination v-model="page" :page-count="pageCount" :total="filtredRows.length" />
+      <UPagination v-model="page" :page-count="pageCount" :total="filteredData.length"/>
     </div>
+
   </div>
 </template>
-
-
