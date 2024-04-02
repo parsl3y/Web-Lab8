@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup >
 
 
 const columns = [
@@ -15,7 +15,7 @@ const columns = [
   {
     key: 'price',
     label: 'Price',
-
+    sortable: true
   },
   {
     key: 'rating',
@@ -35,7 +35,7 @@ const columns = [
   {
     key: 'thumbnail',
     label: 'Thumbnail',
-
+    sortable: false
   }
 ]
 
@@ -87,7 +87,7 @@ const rows = computed(() => {
   const slice = sortedData.value.slice((page.value - 1) * pageCount, page.value * pageCount);
   return slice;
 });
-
+// Фільтр за алфавітом і навпаки
 const handleSort = (columnKey) => {
   if (sortColumn.value === columnKey) {
     sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';

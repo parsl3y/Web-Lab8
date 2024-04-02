@@ -1,160 +1,60 @@
-<script setup lang="ts">
+<template>
+  <div class="chart-container">
+    <canvas id="myChart"></canvas>
+  </div>
+  <router-link to="./student" class="text-blue-500 hover:underline">Перейти до продуктів.</router-link>
+  <Title> Graphic </Title>
+</template>
 
+<script>
+import Chart from 'chart.js/auto'; // оптимальна версія chart
 
-const columns = [
-  {
-    key: 'title',
-    label: 'Title',
-    sortable: true
+export default {
+  mounted() {
+    this.renderChart();
   },
-  {
-    key: 'description',
-    label: 'Description',
-    sortable: true
-  },
-  {
-    key: 'price',
-    label: 'Price',
-
-  },
-  {
-    key: 'rating',
-    label: 'Rating',
-    sortable: true
-  },
-  {
-    key: 'brand',
-    label: 'Brand',
-    sortable: true
-  },
-  {
-    key: 'category',
-    label: 'Category',
-    sortable: true
-  },
-  {
-    key: 'thumbnail',
-    label: 'Thumbnail',
-
-  }
-]
-
-const { data } = await useFetch('https://dummyjson.com/products');
-const people = data.value.products;
-
-const q = ref('');
-const page = ref(1);
-const pageCount = 4;
-
-const filteredData = computed(() => {
-  if (!q.value) {
-    return people;
-  }
-
-  return people.filter(person => Object.values(person).some(value => String(value).toLowerCase().includes(q.value.toLowerCase())));
-});
-
-const sortColumn = ref(null);
-const sortDirection = ref('asc');
-
-const sortedData = computed(() => {
-  if (!sortColumn.value) {
-    return filteredData.value;
-  }
-
-  return [...filteredData.value].sort((a, b) => {
-    const column = sortColumn.value;
-
-    const aValue = a[column];
-    const bValue = b[column];
-
-    if (aValue === bValue) {
-      return 0;
+  methods: {
+    renderChart() {
+      const ctx = document.getElementById('myChart').getContext('2d');
+      const myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['2022 (Q3)', '2022 (Q4)', '2023 (Q1)', '2023 (Q2)', '2023 (Q3)', '2023 (Q4)', '2024 (Q1)', '2024 (Q2)'],
+          datasets: [{
+            label: 'Data',
+            data: [30, 22.5, 40, 20, 25, 10, 15, 22.5],
+            backgroundColor: 'white',
+            borderColor: 'Green',
+            borderWidth: 1,
+            pointRadius: 0 // точки на верхівках 0
+          }]
+        },
+        options: {
+          scales: {
+            x: {
+              grid: {
+                display: false //  вертикальні лінії 0
+              }
+            },
+            y: {
+              max: 50,
+              min: 0,
+              ticks: {
+                stepSize: 10
+              }
+            }
+          }
+        }
+      });
     }
-
-    if (sortDirection.value === 'asc') {
-      return aValue < bValue ? -1 : 1;
-    } else {
-      return aValue > bValue ? -1 : 1;
-    }
-  });
-});
-
-const rows = computed(() => {
-  if (sortedData.value.length <= 5) {
-    page.value = 1;
   }
-  const slice = sortedData.value.slice((page.value - 1) * pageCount, page.value * pageCount);
-  return slice;
-});
-
-const handleSort = (columnKey) => {
-  if (sortColumn.value === columnKey) {
-    sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
-  } else {
-    sortColumn.value = columnKey;
-    sortDirection.value = 'asc';
-  }
-};
+}
 </script>
 
-<template>
+<style scoped>
+.chart-container {
+  background-color: white;
+  width: 60%;
 
-  <title>Graphic</title>
-  <router-link to="./student" class="text-blue-500 hover:underline">Перейти до продуктів</router-link>
-
-  <div class="flex px-3 py-3.5 border-b border-gray-200 dark:border-gray-700">
-    <UInput v-model="q" placeholder="Filter people..."/>
-  </div>
-
-  <div>
-    <UTable :columns="columns" :rows="rows" >
-      <template #thumbnail-data="{row}">
-        <img :src="row.thumbnail" alt="" class="w-[100px] h-[100px]">
-      </template>
-      <template #description-data="{row}">
-        <div class="text-wrap">{{ row.description }}</div>
-      </template>
-      <template #price-data="{row}">
-        <div>{{ row.price }}</div>
-      </template>
-      <template #rating-data="{row}">
-        <div :class="{ 'bg-red-500/40': row.rating < 4.5, 'bg-green-500/40': row.rating >= 4.5 }" class="px-3 py-2">
-          {{ row.rating }}
-        </div>
-      </template>
-      <template #brand-data="{row}">
-        <div>{{ row.brand }}</div>
-      </template>
-      <template #category-data="{row}">
-        <div>{{ row.category }}</div>
-      </template>
-      <template #title-header="{column}">
-        <div @click="handleSort(column.key)" style="cursor: pointer;">{{ column.label }}</div>
-      </template>
-      <template #description-header="{column}">
-        <div @click="handleSort(column.key)" style="cursor: pointer;">{{ column.label }}</div>
-      </template>
-      <template #price-header="{column}">
-        <div @click="handleSort(column.key)" style="cursor: pointer;">{{ column.label }}</div>
-      </template>
-      <template #rating-header="{column}">
-        <div @click="handleSort(column.key)" style="cursor: pointer;">{{ column.label }}</div>
-      </template>
-      <template #brand-header="{column}">
-        <div @click="handleSort(column.key)" style="cursor: pointer;">{{ column.label }}</div>
-      </template>
-      <template #category-header="{column}">
-        <div @click="handleSort(column.key)" style="cursor: pointer;">{{ column.label }}</div>
-      </template>
-      <template #thumbnail-header="{column}">
-
-      </template>
-    </UTable>
-
-    <div class="flex justify-center px-3 py-3.5 border-t border-gray-200 dark:border-gray-700">
-      <UPagination v-model="page" :page-count="pageCount" :total="filteredData.length"/>
-    </div>
-
-  </div>
-</template>
+}
+</style>
