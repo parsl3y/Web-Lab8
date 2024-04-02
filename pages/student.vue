@@ -101,11 +101,11 @@ const handleSort = (columnKey) => {
 <template>
 
   <title>Student list</title>
-  <router-link to="./graphic" class="text-blue-500 hover:underline">Перейти до графіків</router-link>
+
 
   <div class="flex px-3 py-3.5 border-b border-gray-200 dark:border-gray-700">
-    <UInput v-model="q" placeholder="Filter people..."/>
-  </div>
+    <UInput v-model="q" placeholder="Filter people..."/><router-link to="./graphic" class="text-blue-500 hover:underline"> <pre>  Перейти до графіків   </pre></router-link>
+</div>
 
   <div>
     <UTable :columns="columns" :rows="rows" >
