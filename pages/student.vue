@@ -105,7 +105,8 @@ const handleSort = (columnKey) => {
 
   <div class="flex px-3 py-3.5 border-b border-gray-200 dark:border-gray-700">
     <UInput v-model="q" placeholder="Filter people..."/><router-link to="./graphic" class="text-blue-500 hover:underline"> <pre>  Перейти до графіків   </pre></router-link>
-    <router-link to="./BlogPosts" class="text-blue-500 hover:underline">Перейти до Laravel.</router-link>
+    <router-link to="./BlogPosts" class="text-blue-500 hover:underline"> <pre> Перейти до Постів </pre> </router-link>
+    <router-link to="./BlogCategories" class="text-blue-500 hover:underline"> <pre> Перейти до Категорій </pre></router-link>
   </div>
 
 
